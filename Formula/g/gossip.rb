@@ -8,6 +8,7 @@ class Gossip < Formula
   head "https://github.com/mikedilger/gossip.git", branch: "master"
 
   depends_on "rust" => :build
+  depends_on :macos # build fails on linux
 
   def install
     system "cargo", "install", *std_cargo_args, "--features", "lang-cjk"
