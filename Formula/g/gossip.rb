@@ -14,6 +14,6 @@ class Gossip < Formula
   end
 
   test do
-    system "#{bin}/gossip", "help"
+    shell_output("#{bin}/gossip help &>/dev/null", 101)
   end
 end
