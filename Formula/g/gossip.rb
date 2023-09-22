@@ -8,9 +8,12 @@ class Gossip < Formula
   head "https://github.com/mikedilger/gossip.git", branch: "master"
 
   depends_on "rust" => :build
-  depends_on :macos # build fails on linux
+  depends_on :macos # linux build requires additional runtime dependencies
 
   def install
+    # required for successful build on intel or linux
+    ENV["RUSTFLAGS"] = "--cfg tokio_unstable"
+
     system "cargo", "install", *std_cargo_args, "--features", "lang-cjk"
   end
 
