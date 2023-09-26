@@ -8,7 +8,6 @@ class Gossip < Formula
   head "https://github.com/mikedilger/gossip.git", branch: "master"
 
   depends_on "rust" => :build
-  depends_on :macos # linux build requires additional runtime dependencies
 
   def install
     # required for successful build on intel or linux
@@ -18,8 +17,9 @@ class Gossip < Formula
   end
 
   test do
-    mkdir_p testpath/"Library/Application Support"
-    input = <<~JSON
+    mkdir_p testpath/"Library/Application Support" # for macos
+    mkdir_p testpath/".local/share" # for linux
+    json = <<~JSON
       {
         "id": "b9fead6eef87d8400cbc1a5621600b360438affb9760a6a043cc0bddea21dab6",
         "kind": 1,
@@ -30,6 +30,6 @@ class Gossip < Formula
         "sig": "76d19889a803236165a290fa8f3cf5365af8977ee1e002afcfd37063d1355fc755d0293d27ba0ec1c2468acfaf95b7e950e57df275bb32d7a4a3136f8862d2b7"
       }
     JSON
-    assert_match "Valid event", shell_output("#{bin}/gossip verify_json '#{input}'")
+    assert_match "Valid event", shell_output("#{bin}/gossip verify_json '#{json}'")
   end
 end
