@@ -2,18 +2,39 @@ class Gossip < Formula
   desc "Desktop client for Nostr written in Rust"
   homepage "https://github.com/mikedilger/gossip"
   url "https://github.com/mikedilger/gossip.git",
-      tag:      "v0.8.0",
-      revision: "c9bb3704e94e105d7cf97de67e89ccf7f01ef69b"
+      tag:      "v0.8.1",
+      revision: "404f5a405c8796e90bb5cc078378149d3c341f26"
   license "MIT"
   head "https://github.com/mikedilger/gossip.git", branch: "master"
 
   depends_on "rust" => :build
 
+  on_macos do
+    depends_on "cmake" => :build
+    depends_on "ffmpeg" => :build
+  end
+
+  on_linux do
+    depends_on "libxkbcommon"
+    depends_on "mesa"
+  end
+
   def install
+    features = ["lang-cjk"]
+    features.push("video-ffmpeg") if OS.mac?
+    cargo_args = "--features=#{features.join(",")}"
+
     # required for successful build on intel or linux
     ENV["RUSTFLAGS"] = "--cfg tokio_unstable"
 
-    system "cargo", "install", *std_cargo_args, "--features", "lang-cjk"
+    system "cargo", "install", *std_cargo_args, *cargo_args
+
+    if OS.mac?
+      cd "target/release" do
+        libexec.install Dir[shared_library("libSDL2*")]
+        bin.install_symlink Dir["#{libexec}/*"]
+      end
+    end
   end
 
   test do
